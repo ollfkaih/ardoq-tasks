@@ -14,3 +14,28 @@
     margin: 12px;
     border-radius: 4px;
 }
+
+.mapboxgl-popup-content {
+
+    min-width: 200px;
+  }
+  
+.row-title {
+    align-items: center;
+    background-color: #4094ae;
+    border: 1px solid #4094ae;
+    border-radius: 16px;
+    color: #ffffff;
+    font-weight: normal;
+    justify-content: center;
+    margin: 1;
+    padding: 2px;
+    text-align: center;
+}
+
+.name {
+    color: rgba(0, 0, 0, 0.7); 
+    font-size: 0.875rem;
+    margin: 0;
+    text-align: center;
+}
