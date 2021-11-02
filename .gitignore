@@ -1,0 +1,4 @@
+oslo-bysykkel-kart/node_modules/*
+oslo-bysykkel-kart/package-lock.json
+oslo-bysykkel-kart/src/station_status.json
+oslo-bysykkel-kart/src/station.json
