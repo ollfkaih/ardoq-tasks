@@ -42,7 +42,7 @@ const Map = () => {
   useEffect(() => {
     if (map.current) return; // initialize map only once
     if (!stations || !stationsStatus) return;
-    
+
     createMap();
     createToolTipOnClick();
 
@@ -62,8 +62,6 @@ const Map = () => {
       features: stationsGeoJSONArray,
     };
     addPointsToMap();
-
-    
 
     function createMap() {
       map.current = new mapboxgl.Map({
@@ -93,7 +91,8 @@ const Map = () => {
               station_name={currentStationInfo.name}
               num_bikes_available={currentStationStatus.num_bikes_available}
               num_docks_available={currentStationStatus.num_docks_available}
-              capacity={currentStationInfo.capacity} />,
+              capacity={currentStationInfo.capacity}
+            />,
             popupNode
           );
           popUpRef.current
@@ -103,7 +102,7 @@ const Map = () => {
         }
       });
     }
-    
+
     function addPointsToMap() {
       map.current.on("load", () => {
         map.current.addSource("stationsMapLayer", {
@@ -123,7 +122,6 @@ const Map = () => {
         });
       });
     }
-
   }, [stations, stationsStatus]);
 
   return <div ref={mapContainer} className="map-container"></div>;
