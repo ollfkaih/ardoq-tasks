@@ -42,48 +42,11 @@ const Map = () => {
   useEffect(() => {
     if (map.current) return; // initialize map only once
     if (!stations || !stationsStatus) return;
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v11",
-      center: [lng, lat],
-      zoom: zoom,
-    });
+    
+    createMap();
+    createToolTipOnClick();
 
-    map.current.on("click", (e) => {
-      const features = map.current.queryRenderedFeatures(e.point, {
-        layers: ["stationsMapLayer"],
-      });
-      if (features.length) {
-        const feature = features[0];
-        const currentStationStatus = stationsStatus.find(
-          (station) => station.station_id === feature.properties.station_id
-        );
-        const currentStationInfo = stations.find(
-          (s) => s.station_id === feature.properties.station_id
-        );
-        const popupNode = document.createElement("div");
-        ReactDOM.render(
-          <Tooltip
-            station_name={currentStationInfo.name}
-            num_bikes_available={currentStationStatus.num_bikes_available}
-            num_docks_available={currentStationStatus.num_docks_available}
-            capacity={currentStationInfo.capacity}
-          />,
-          popupNode
-        );
-        popUpRef.current
-          .setLngLat(e.lngLat)
-          .setDOMContent(popupNode)
-          .addTo(map.current);
-      }
-    });
-  }, [stations, stationsStatus]);
-
-  useEffect(() => {
-    if (!map.current) return;
-    if (!stations || !stationsStatus) return;
-
-    const stationsGeoJSONArray = stations?.map((station) => {
+    const stationsGeoJSONArray = stations.map((station) => {
       return {
         type: "Feature",
         geometry: {
@@ -94,28 +57,73 @@ const Map = () => {
       };
     });
 
-    const featureCollection = {
+    const stationsCollection = {
       type: "FeatureCollection",
       features: stationsGeoJSONArray,
     };
+    addPointsToMap();
 
-    map.current.on("load", () => {
-      map.current.addSource("stationsMapLayer", {
-        type: "geojson",
-        data: featureCollection,
+    
+
+    function createMap() {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: "mapbox://styles/mapbox/streets-v11",
+        center: [lng, lat],
+        zoom: zoom,
       });
-      map.current.addLayer({
-        id: "stationsMapLayer",
-        type: "circle",
-        source: "stationsMapLayer",
-        paint: {
-          "circle-color": "#11aa22",
-          "circle-radius": 8,
-          "circle-stroke-color": "#222222",
-          "circle-stroke-width": 2,
-        },
+    }
+
+    function createToolTipOnClick() {
+      map.current.on("click", (e) => {
+        const features = map.current.queryRenderedFeatures(e.point, {
+          layers: ["stationsMapLayer"],
+        });
+        if (features.length) {
+          const feature = features[0];
+          const currentStationStatus = stationsStatus.find(
+            (station) => station.station_id === feature.properties.station_id
+          );
+          const currentStationInfo = stations.find(
+            (s) => s.station_id === feature.properties.station_id
+          );
+          const popupNode = document.createElement("div");
+          ReactDOM.render(
+            <Tooltip
+              station_name={currentStationInfo.name}
+              num_bikes_available={currentStationStatus.num_bikes_available}
+              num_docks_available={currentStationStatus.num_docks_available}
+              capacity={currentStationInfo.capacity} />,
+            popupNode
+          );
+          popUpRef.current
+            .setLngLat(e.lngLat)
+            .setDOMContent(popupNode)
+            .addTo(map.current);
+        }
       });
-    });
+    }
+    
+    function addPointsToMap() {
+      map.current.on("load", () => {
+        map.current.addSource("stationsMapLayer", {
+          type: "geojson",
+          data: stationsCollection,
+        });
+        map.current.addLayer({
+          id: "stationsMapLayer",
+          type: "circle",
+          source: "stationsMapLayer",
+          paint: {
+            "circle-color": "#11aa22",
+            "circle-radius": 8,
+            "circle-stroke-color": "#222222",
+            "circle-stroke-width": 2,
+          },
+        });
+      });
+    }
+
   }, [stations, stationsStatus]);
 
   return <div ref={mapContainer} className="map-container"></div>;
